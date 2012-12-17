@@ -41,3 +41,10 @@ fieldset {
   width: 98%;
   padding: 4px;
 }
+
+.label-container {
+  margin: 12px 0px;
+}
+#fam-slider {
+  margin: 12px 0px;
+}

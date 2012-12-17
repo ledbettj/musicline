@@ -14,6 +14,8 @@ window.Musicline = window.Musicline || {};
       spent: false
     };
 
+    this.familiarityRange = params.familiarityRange || [0, 100];
+
     this.nodes = [this.root];
     this.links = [];
 
@@ -103,7 +105,10 @@ window.Musicline = window.Musicline || {};
 
   Application.prototype.addSimilar = function(from) {
     var app = this;
-    d3.json('/artists/' + from.name + '/similar', function(similar) {
+    var args = 'fMmin='  + app.familiarityRange[0] +
+               '&fMax=' + app.familiarityRange[1];
+
+    d3.json('/artists/' + from.name + '/similar?' + args, function(similar) {
 
       _(similar).each(function(artistName){
         var newNode = _(app.nodes).find(function(n) {

@@ -15,16 +15,39 @@
         <p class="validateTips">Let's pick a musical artist to start with:</p>
         <form>
           <input type="text" name="artist" id="input-artist" class="text ui-widget-content ui-corner-all" placeholder="The Rolling Stones" />
+          <div class="label-container">
+            Artist Familiarity: 
+            <span id="fam-label">Give me everything!</span>
+          </div>
+          <div id="fam-slider"></div>
         </form>
       </div>
     </div>
 
     <script src="/js/application.js"></script>
     <script>
+      $("#fam-slider").slider({
+        range: true,
+        min:   0,
+        max:   100,
+        values: [0, 100],
+        slide: function(e, ui) {
+          if (ui.values[0] <= 20 && ui.values[1] >= 80) {
+            $("#fam-label").text("Give me everything!");
+          } else if (ui.values[0] >= 20 && ui.values[1] >= 80) {
+            $("#fam-label").text("None of that obscure crap.");
+          } else if (ui.values[0] <= 20 && ui.values[1] <= 80) {
+            $("#fam-label").text("Let's keep it obscure.");
+          } else {
+            $("#fam-label").text("A nice middle ground.");
+          }
+        }
+      });
+
       $("#dialog-form").dialog({
         autoOpen: true,
         modal:    false,
-        height:   210,
+        height:   300,
         width:    350,
         buttons: [{
           text: 'Go!',
@@ -34,7 +57,8 @@
           var artist = $("#input-artist").val().trim();
           var ml = window.Musicline;
           ml.instance = new ml.Application({
-            rootName: artist.length > 0 ? artist : 'The Rolling Stones'
+            rootName: artist.length > 0 ? artist : 'The Rolling Stones',
+            familiarityRange: $("#fam-slider").slider('values')
           });
         },
         open: function() {
