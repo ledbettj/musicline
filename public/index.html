@@ -42,6 +42,15 @@
           ml.instance = new ml.Application({
             rootName: artist.length > 0 ? artist : 'The Rolling Stones'
           });
+        },
+        open: function() {
+          $("#dialog-form").keypress(function(e) {
+            if (e.keyCode == $.ui.keyCode.ENTER) {
+              $(this).dialog('close');
+              e.preventDefault();
+              return false;
+            }
+          });
         }
       });
     </script>
