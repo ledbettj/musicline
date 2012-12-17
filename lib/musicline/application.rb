@@ -1,8 +1,12 @@
 class Musicline::Application < Sinatra::Base
   API_KEY = 'R2TFDDCFU7ZZUMTCR'
 
-  get '/artist/:artist/similar' do
-    JSON.dump(echo.artist(params[:artist]).similar['artists'])
+  get '/artists/:artist/similar' do
+    items = echo.artist(params[:artist]).similar['artists'].map do |row|
+      row['name']
+    end
+
+    JSON.dump(items)
   end
 
   def echo

@@ -1,1 +1,18 @@
-derp
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="http://d3js.org/d3.v2.js"></script>
+    <script src="/js/lodash.min.js"></script>
+    <link href="/css/main.css" rel="stylesheet"></link>
+  </head>
+  <body>
+    <script src="/js/application.js"></script>
+    <script>
+      (function(ml) {
+        var app = new ml.Application({
+          rootName: prompt("Where should we start?")
+        });
+      })(window.Musicline);
+    </script>
+  </body>
+</html>
