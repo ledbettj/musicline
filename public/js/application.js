@@ -25,7 +25,7 @@ window.Musicline = window.Musicline || {};
     this.force  = d3.layout.force()
       .nodes(this.nodes)
       .links(this.links)
-      .linkDistance(150)
+      .linkDistance(function(d) { return 75 + Math.random() * 95;})
       .charge(-400)
       .size([this.width, this.height]);
 
