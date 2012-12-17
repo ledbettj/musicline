@@ -30,7 +30,10 @@ window.Musicline = window.Musicline || {};
     this.createElements();
     this.updateVisualization();
 
-    this.preview(this.root);
+    if (this.doPreview) {
+      this.preview(this.root);
+    }
+
     this.addSimilar(this.root);
   };
 
