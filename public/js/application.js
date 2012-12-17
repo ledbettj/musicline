@@ -1,5 +1,5 @@
 /*jshint undef:true browser:true*/
-/*global d3 _*/
+/*global d3 $ _*/
 
 window.Musicline = window.Musicline || {};
 (function(e) {
@@ -20,15 +20,26 @@ window.Musicline = window.Musicline || {};
 
     this.familiarityRange = params.familiarityRange || [0, 100];
     this.growBy = params.growBy || 15;
+    this.doPreview = params.preview !== undefined ? params.preview : true;
 
     this.nodes = [this.root];
     this.links = [];
 
+    this.createPlayer();
     this.createForce();
     this.createElements();
     this.updateVisualization();
 
+    this.preview(this.root);
     this.addSimilar(this.root);
+  };
+
+  Application.prototype.createPlayer = function() {
+    this.player = $("<audio>")
+      .attr('preload', 'auto')
+      .css('display', 'none');
+
+    $('body').append(this.player);
   };
 
   Application.prototype.createForce = function() {
@@ -147,6 +158,9 @@ window.Musicline = window.Musicline || {};
           if (!d.spent) {
             d.spent = true;
             app.addSimilar(d);
+            if (app.doPreview) {
+              app.preview(d);
+            }
           }
         })
         .on('mouseover', function(d) {
@@ -213,6 +227,22 @@ window.Musicline = window.Musicline || {};
 
     this.updateLinks();
     this.updateNodes();
+  };
+
+  Application.prototype.preview = function(d) {
+    var app = this;
+
+    d3.json('/artists/' + d.name + '/clip', function(data) {
+      if (data) {
+        app.play(data.url);
+      }
+    });
+  };
+
+  Application.prototype.play = function(url) {
+   // this.player.get(0).stop();
+    this.player.attr('src', url);
+    this.player.get(0).play();
   };
 
   e.Application = Application;

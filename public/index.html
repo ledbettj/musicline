@@ -25,6 +25,8 @@
             <span id="fam-label">Give me everything!</span>
           </div>
           <div id="fam-slider"></div>
+          <input type="checkbox" name="preview" id="input-preview" class="checkbox ui-widget-content ui-corner-all" checked />
+          <label for="input-preview">Play music</label>
         </form>
       </div>
     </div>
@@ -61,7 +63,7 @@
       $("#dialog-form").dialog({
         autoOpen: true,
         modal:    false,
-        height:   300,
+        height:   350,
         width:    350,
         buttons: [{
           text: 'Go!',
@@ -73,7 +75,8 @@
           ml.instance = new ml.Application({
             rootName: artist.length > 0 ? artist : 'The Rolling Stones',
             familiarityRange: $("#fam-slider").slider('values'),
-            growBy: $("#rpc-slider").slider('value')
+            growBy: $("#rpc-slider").slider('value'),
+            preview: $("#input-preview").is(":checked")
           });
         },
         open: function() {

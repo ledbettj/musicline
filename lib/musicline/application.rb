@@ -6,6 +6,7 @@ class Musicline::Application < Sinatra::Base
     params[:fMin] = (params[:fMin] || 0).to_i   / 100.0
     params[:fMax] = (params[:fMax] || 100).to_i / 100.0
     params[:rNum] = (params[:rNum] || 15).to_i
+
     items = echo.artist(params[:artist]).similar(
       :min_familiarity => params[:fMin],
       :max_familiarity => params[:fMax],
@@ -16,6 +17,23 @@ class Musicline::Application < Sinatra::Base
 
     JSON.dump(items)
   end
+
+  get '/artists/:artist/clip' do
+    response = echo.song.search(
+      :bucket => ['id:7digital-US', 'tracks'],
+      :results => 1,
+      :artist => params[:artist],
+      :song_type => 'studio'
+    )
+
+    begin
+      JSON.dump({:url => response['songs'][0]['tracks'][0]['preview_url']})
+    rescue
+      status 204
+    end
+  end
+
+  private
 
   def echo
     @echo ||= Echonest(API_KEY)
