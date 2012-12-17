@@ -27,3 +27,17 @@ text.node {
   opacity: 25%;
   stroke-width: 1px;
 }
+
+
+fieldset {
+  border: none;
+}
+
+#dialog-form {
+  font-size: 12px;
+}
+
+#input-artist {
+  width: 98%;
+  padding: 4px;
+}

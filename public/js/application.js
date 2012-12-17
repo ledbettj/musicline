@@ -33,6 +33,8 @@ window.Musicline = window.Musicline || {};
     this.nodeGroup = this.vis.append('svg:g');
 
     this.updateVisualization();
+
+    this.addSimilar(this.root);
   };
 
   Application.prototype.updateVisualization = function() {
