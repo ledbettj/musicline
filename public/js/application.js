@@ -240,7 +240,6 @@ window.Musicline = window.Musicline || {};
   };
 
   Application.prototype.play = function(url) {
-   // this.player.get(0).stop();
     this.player.attr('src', url);
     this.player.get(0).play();
   };

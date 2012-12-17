@@ -21,13 +21,13 @@ class Musicline::Application < Sinatra::Base
   get '/artists/:artist/clip' do
     response = echo.song.search(
       :bucket => ['id:7digital-US', 'tracks'],
-      :results => 1,
+      :results => 5,
       :artist => params[:artist],
       :song_type => 'studio'
     )
 
     begin
-      JSON.dump({:url => response['songs'][0]['tracks'][0]['preview_url']})
+      JSON.dump({:url => response['songs'].sample['tracks'].sample['preview_url']})
     rescue
       status 204
     end
