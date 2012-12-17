@@ -24,7 +24,7 @@ text.node {
 
 .link {
   stroke: #808080;
-  opacity: 25%;
+  stroke-opacity: 50%;
   stroke-width: 1px;
 }
 
