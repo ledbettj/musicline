@@ -23,13 +23,15 @@ class Musicline::Application < Sinatra::Base
       :bucket => ['id:spotify-WW', 'tracks'],
       :results => 10,
       :artist => params[:artist],
-      :song_type => 'studio'
+      :song_type => 'studio',
+      :limit => true
     )
 
     begin
       songs = response['songs'].collect do |s|
-        s['tracks'].sample['foreign_id'].gsub('spotify-WW:track:', '')
-      end
+        s['tracks'].reject!{|t| !t.has_key?('foreign_id')}
+        s['tracks'].sample['foreign_id'].gsub('spotify-WW:track:', '') rescue nil
+      end.compact
 
       JSON.dump(songs)
     rescue
