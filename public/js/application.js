@@ -7,13 +7,14 @@ window.Musicline = window.Musicline || {};
 
   var Application = function(params) {
     var body    = d3.select('body').node();
+
     this.width  = body.clientWidth;
     this.height = body.clientHeight;
 
-    this.root = params.root || {
-      name: params.rootName || "Tool",
+    this.root = {
+      name:  params.rootName || "Tool",
       spent: true,
-      lit: false,
+      lit:   false,
       color: 'hsl(' + Math.random() * 360 + ",75%,55%)"
     };
 
@@ -22,13 +23,23 @@ window.Musicline = window.Musicline || {};
     this.nodes = [this.root];
     this.links = [];
 
-    this.force  = d3.layout.force()
+    this.createForce();
+    this.createElements();
+    this.updateVisualization();
+
+    this.addSimilar(this.root);
+  };
+
+  Application.prototype.createForce = function() {
+    this.force = d3.layout.force()
       .nodes(this.nodes)
       .links(this.links)
       .linkDistance(function(d) { return 75 + Math.random() * 95;})
       .charge(-400)
       .size([this.width, this.height]);
+  };
 
+  Application.prototype.createElements = function() {
     this.vis = d3.select('body')
       .append('svg:svg')
       .attr('width', this.width)
@@ -37,14 +48,10 @@ window.Musicline = window.Musicline || {};
     this.linkGroup = this.vis.append('svg:g');
     this.nodeGroup = this.vis.append('svg:g');
 
-    this.updateVisualization();
-
-    this.addSimilar(this.root);
   };
 
   Application.prototype.updateVisualization = function() {
     var app = this;
-
 
     this.updateNodes();
     this.updateLinks();
@@ -75,7 +82,7 @@ window.Musicline = window.Musicline || {};
 
   Application.prototype.addSimilar = function(from) {
     var app = this;
-    var args = 'fMmin='  + app.familiarityRange[0] +
+    var args = 'fMmin=' + app.familiarityRange[0] +
                '&fMax=' + app.familiarityRange[1];
 
     d3.json('/artists/' + from.name + '/similar?' + args, function(similar) {
@@ -87,11 +94,11 @@ window.Musicline = window.Musicline || {};
 
         if (!newNode) {
           newNode = {
-            name: artistName,
+            name:  artistName,
             spent: false,
-            lit: false,
-            x: from.x,
-            y: from.y,
+            lit:   false,
+            x:    from.x + Math.random() * 100 - 50,
+            y:    from.y + Math.random() * 100 - 50,
             color: 'hsl(' + Math.random() * 360 + ",75%,55%)"
           };
           app.nodes.push(newNode);
@@ -205,7 +212,6 @@ window.Musicline = window.Musicline || {};
     this.updateLinks();
     this.updateNodes();
   };
-
 
   e.Application = Application;
 })(window.Musicline);
