@@ -16,6 +16,11 @@
         <form>
           <input type="text" name="artist" id="input-artist" class="text ui-widget-content ui-corner-all" placeholder="The Rolling Stones" />
           <div class="label-container">
+            Results per click: 
+            <span id="rpc-label">15</span>
+          </div>
+          <div id="rpc-slider"></div>
+          <div class="label-container">
             Artist Familiarity: 
             <span id="fam-label">Give me everything!</span>
           </div>
@@ -44,6 +49,15 @@
         }
       });
 
+      $("#rpc-slider").slider({
+        min: 5,
+        max: 100,
+        value: 15,
+        slide: function(e, ui) {
+          $("#rpc-label").text(ui.value);
+        }
+      });
+
       $("#dialog-form").dialog({
         autoOpen: true,
         modal:    false,
@@ -58,7 +72,8 @@
           var ml = window.Musicline;
           ml.instance = new ml.Application({
             rootName: artist.length > 0 ? artist : 'The Rolling Stones',
-            familiarityRange: $("#fam-slider").slider('values')
+            familiarityRange: $("#fam-slider").slider('values'),
+            growBy: $("#rpc-slider").slider('value')
           });
         },
         open: function() {

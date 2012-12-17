@@ -5,10 +5,11 @@ class Musicline::Application < Sinatra::Base
 
     params[:fMin] = (params[:fMin] || 0).to_i   / 100.0
     params[:fMax] = (params[:fMax] || 100).to_i / 100.0
-
+    params[:rNum] = (params[:rNum] || 15).to_i
     items = echo.artist(params[:artist]).similar(
       :min_familiarity => params[:fMin],
-      :max_familiarity => params[:fMax]
+      :max_familiarity => params[:fMax],
+      :results         => params[:rNum]
     )['artists'].map do |row|
       row['name']
     end
