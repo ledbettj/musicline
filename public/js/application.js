@@ -11,7 +11,8 @@ window.Musicline = window.Musicline || {};
 
     this.root = params.root || {
       name: params.rootName || "Tool",
-      spent: false
+      spent: true,
+      color: 'hsl(' + Math.random() * 360 + ",75%,55%)"
     };
 
     this.familiarityRange = params.familiarityRange || [0, 100];
@@ -53,26 +54,39 @@ window.Musicline = window.Musicline || {};
             app.addSimilar(d);
           }
         })
+        .on('mouseover', function(d) {
+          if (!d.spent) {
+            d3.select(this).select('text')
+              .style('fill', '#f0f0f0')
+              .style('text-decoration', 'underline');
+
+            d3.select(this).select('circle')
+              .style('fill', d3.rgb(d.color).brighter(1.50));
+          }
+        })
+        .on('mouseout', function(d) {
+          d3.select(this).select('text')
+            .style('fill', '#a0a0a0')
+            .style('text-decoration', 'none');
+
+          d3.select(this).select('circle')
+            .style('fill', d.color);
+
+        })
         .call(this.force.drag);
 
     nodeEnter.append('svg:circle')
       .attr('class', 'node')
       .attr('r', 4)
       .style('fill', function(d) {
-        return 'hsl(' + Math.random() * 360 + ",75%,55%)";
+        return d.color;
       });
 
     nodeEnter.append('svg:text')
       .attr('class', 'node')
       .attr('dx', 8)
       .attr('dy', 4)
-      .text(function(d) { return d.name; })
-      .on('mouseover', function(d) {
-        d3.select(this).style('fill', '#f0f0f0');
-      })
-      .on('mouseout', function(d) {
-        d3.select(this).style('fill', '#e0e0e0');
-      });
+      .text(function(d) { return d.name; });
 
     node.exit().remove();
 
@@ -120,7 +134,8 @@ window.Musicline = window.Musicline || {};
             name: artistName,
             spent: false,
             x: from.x,
-            y: from.y
+            y: from.y,
+            color: 'hsl(' + Math.random() * 360 + ",75%,55%)"
           };
           app.nodes.push(newNode);
         }
