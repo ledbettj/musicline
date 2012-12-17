@@ -25,7 +25,6 @@ window.Musicline = window.Musicline || {};
     this.nodes = [this.root];
     this.links = [];
 
-    this.createPlayer();
     this.createForce();
     this.createElements();
     this.updateVisualization();
@@ -35,14 +34,6 @@ window.Musicline = window.Musicline || {};
     }
 
     this.addSimilar(this.root);
-  };
-
-  Application.prototype.createPlayer = function() {
-    this.player = $("<audio>")
-      .attr('preload', 'auto')
-      .css('display', 'none');
-
-    $('body').append(this.player);
   };
 
   Application.prototype.createForce = function() {
@@ -237,14 +228,16 @@ window.Musicline = window.Musicline || {};
 
     d3.json('/artists/' + d.name + '/clip', function(data) {
       if (data) {
-        app.play(data.url);
+        app.play(d.name, data);
       }
     });
   };
 
-  Application.prototype.play = function(url) {
-    this.player.attr('src', url);
-    this.player.get(0).play();
+  Application.prototype.play = function(artist, trackIds) {
+    var uri = "spotify:trackset:" + artist.replace(':', '') + ':';
+    uri += trackIds.join(',');
+
+    $("#spotify-frame").attr('src', 'https://embed.spotify.com/?uri=' + uri);
   };
 
   e.Application = Application;

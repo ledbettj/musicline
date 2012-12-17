@@ -20,14 +20,18 @@ class Musicline::Application < Sinatra::Base
 
   get '/artists/:artist/clip' do
     response = echo.song.search(
-      :bucket => ['id:7digital-US', 'tracks'],
-      :results => 5,
+      :bucket => ['id:spotify-WW', 'tracks'],
+      :results => 10,
       :artist => params[:artist],
       :song_type => 'studio'
     )
 
     begin
-      JSON.dump({:url => response['songs'].sample['tracks'].sample['preview_url']})
+      songs = response['songs'].collect do |s|
+        s['tracks'].sample['foreign_id'].gsub('spotify-WW:track:', '')
+      end
+
+      JSON.dump(songs)
     rescue
       status 204
     end
