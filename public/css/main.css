@@ -48,3 +48,9 @@ fieldset {
 #fam-slider {
   margin: 12px 0px;
 }
+
+#echolink {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+}
