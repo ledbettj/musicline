@@ -3,6 +3,7 @@
 
 window.Musicline = window.Musicline || {};
 (function(e) {
+  var HILIGHT_COLOR = '#f0f0f0';
 
   var Application = function(params) {
     var body    = d3.select('body').node();
@@ -12,6 +13,7 @@ window.Musicline = window.Musicline || {};
     this.root = params.root || {
       name: params.rootName || "Tool",
       spent: true,
+      lit: false,
       color: 'hsl(' + Math.random() * 360 + ",75%,55%)"
     };
 
@@ -23,7 +25,7 @@ window.Musicline = window.Musicline || {};
     this.force  = d3.layout.force()
       .nodes(this.nodes)
       .links(this.links)
-      .linkDistance(function(d) { return 75 + Math.random() * 95;})
+      .linkDistance(150)
       .charge(-400)
       .size([this.width, this.height]);
 
@@ -43,64 +45,17 @@ window.Musicline = window.Musicline || {};
   Application.prototype.updateVisualization = function() {
     var app = this;
 
+
+    this.updateNodes();
+    this.updateLinks();
+
     var node = this.nodeGroup.selectAll('g.node')
       .data(this.nodes, function(d) { return d.name; });
-
-    var nodeEnter = node.enter().append('svg:g')
-        .attr('class', 'node')
-        .on('mouseup', function(d, i) {
-          if (!d.spent) {
-            d.spent = true;
-            app.addSimilar(d);
-          }
-        })
-        .on('mouseover', function(d) {
-          if (!d.spent) {
-            d3.select(this).select('text')
-              .style('fill', '#f0f0f0')
-              .style('text-decoration', 'underline');
-
-            d3.select(this).select('circle')
-              .style('fill', d3.rgb(d.color).brighter(1.50));
-          }
-        })
-        .on('mouseout', function(d) {
-          d3.select(this).select('text')
-            .style('fill', '#a0a0a0')
-            .style('text-decoration', 'none');
-
-          d3.select(this).select('circle')
-            .style('fill', d.color);
-
-        })
-        .call(this.force.drag);
-
-    nodeEnter.append('svg:circle')
-      .attr('class', 'node')
-      .attr('r', 4)
-      .style('fill', function(d) {
-        return d.color;
-      });
-
-    nodeEnter.append('svg:text')
-      .attr('class', 'node')
-      .attr('dx', 8)
-      .attr('dy', 4)
-      .text(function(d) { return d.name; });
-
-    node.exit().remove();
 
     var link = this.linkGroup.selectAll('.link')
       .data(this.links, function(d) {
         return d.source.name + "-" + d.target.name;
       });
-
-    link
-      .enter()
-      .append('svg:line')
-      .attr('class', 'link');
-
-    link.exit().remove();
 
     this.force.on('tick', function() {
 
@@ -112,6 +67,7 @@ window.Musicline = window.Musicline || {};
       node.attr('transform', function(d) {
         return 'translate(' + d.x + ',' + d.y + ')';
       });
+
     });
 
     this.force.start();
@@ -133,6 +89,7 @@ window.Musicline = window.Musicline || {};
           newNode = {
             name: artistName,
             spent: false,
+            lit: false,
             x: from.x,
             y: from.y,
             color: 'hsl(' + Math.random() * 360 + ",75%,55%)"
@@ -149,6 +106,104 @@ window.Musicline = window.Musicline || {};
       app.updateVisualization();
     });
 
+  };
+
+  Application.prototype.updateLinks = function() {
+    var link = this.linkGroup.selectAll('.link')
+      .data(this.links, function(d) {
+        return d.source.name + "-" + d.target.name;
+      });
+
+    link
+      .enter()
+      .append('svg:line')
+      .attr('class', 'link');
+
+    link.exit().remove();
+
+    link.style('stroke', function(d) {
+      return d.lit ? HILIGHT_COLOR : "#808080";
+    });
+  };
+
+  Application.prototype.updateNodes = function() {
+    var app = this;
+
+    var node = this.nodeGroup.selectAll('g.node')
+      .data(this.nodes, function(d) { return d.name; });
+
+    var nodeEnter = node.enter().append('svg:g')
+        .attr('class', 'node')
+        .on('mouseup', function(d, i) {
+          if (!d.spent) {
+            d.spent = true;
+            app.addSimilar(d);
+          }
+        })
+        .on('mouseover', function(d) {
+          if (!d.spent) {
+            d3.select(this).select('text')
+              .style('text-decoration', 'underline');
+
+            d3.select(this).select('circle')
+              .style('fill', d3.rgb(d.color).brighter(1.50));
+          }
+
+          app.showConnected(d);
+        })
+        .on('mouseout', function(d) {
+          d3.select(this).select('text')
+            .style('fill', '#a0a0a0')
+            .style('text-decoration', 'none');
+
+          d3.select(this).select('circle')
+            .style('fill', d.color);
+
+          app.dimConnected(d);
+
+        })
+        .call(this.force.drag);
+
+    nodeEnter.append('svg:circle')
+      .attr('class', 'node')
+      .attr('r', 4)
+      .style('fill', function(d) {
+        return d.color;
+      });
+
+    nodeEnter.append('svg:text')
+      .attr('class', 'node')
+      .attr('dx', 8)
+      .attr('dy', 4)
+      .text(function(d) { return d.name; });
+
+    node.selectAll('text')
+      .style('fill', function(d) {
+        return d.lit ? HILIGHT_COLOR : '#a0a0a0';
+      });
+
+    node.exit().remove();
+  };
+
+  Application.prototype.showConnected = function(d) {
+    _(this.links).each(function(link) {
+      link.lit = (d.name == link.source.name) || (d.name == link.target.name);
+      link.source.lit = link.source.lit || link.lit;
+      link.target.lit = link.target.lit || link.lit;
+    });
+
+    this.updateLinks();
+    this.updateNodes();
+  };
+
+  Application.prototype.dimConnected = function(d) {
+    _(this.links).each(function(link) {
+      link.lit = false;
+      link.source.lit = link.target.lit = false;
+    });
+
+    this.updateLinks();
+    this.updateNodes();
   };
 
 
