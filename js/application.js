@@ -42,12 +42,11 @@ window.Musicline = window.Musicline || {};
 
     body.addEventListener('drop', function(e) {
       var item = e.dataTransfer.getData('Text');
-      this.vis.clear();
       if (item.indexOf('playlist:') !== -1) {
+        this.vis.clear();
         this.handlePlaylistDrop(item);
       } else if (item.indexOf('artist:') !== -1) {
-        this._first = true;
-        this.handleArtistDrop(item);
+        this.handleArtistDrop(item, e);
       } else {
         console.log("unhandled", item);
       }
@@ -57,13 +56,12 @@ window.Musicline = window.Musicline || {};
   };
 
   Application.prototype.handleDrop = function() {
-    this.vis.clear();
 
     _(this.models.application.links).each(function(item) {
       if (item.indexOf('playlist:') !== -1) {
+        this.vis.clear();
         this.handlePlaylistDrop(item);
       } else if (item.indexOf('artist:') !== -1) {
-        this._first = true;
         this.handleArtistDrop(item);
       } else {
         console.log("unhandled", item);
@@ -91,11 +89,11 @@ window.Musicline = window.Musicline || {};
 
   };
 
-  Application.prototype.handleArtistDrop = function(artistCode) {
+  Application.prototype.handleArtistDrop = function(artistCode, e) {
 
     this.models.Artist.fromURI(artistCode, function(artist) {
       if (!this.vis.findNode(artist.name)) {
-        var n = this.vis.createNode(artist.name);
+        var n = this.vis.createNode(artist.name, e);
         n.spent = true;
         this.addSimilar(n);
         this.play(n);

@@ -47,8 +47,8 @@ window.Musicline = window.Musicline || {};
       .links(this.links)
       .linkDistance(function(d) { return 75 + Math.random() * 95;})
     .linkStrength(0.5)
-      .charge(-150)
-      .gravity(0.01)
+      .charge(-10)
+      .gravity(0)
       .size([this.width, this.height]);
   };
 
@@ -66,6 +66,7 @@ window.Musicline = window.Musicline || {};
   Visualization.prototype.redraw = function() {
     this.updateNodes();
     this.updateLinks();
+    var app = this;
 
     var node = this.nodeGroup.selectAll('.node')
       .data(this.nodes, function(d) { return d.name; });
@@ -83,6 +84,8 @@ window.Musicline = window.Musicline || {};
           .attr("y2", function(d) { return d.target.y; });
 
       node.attr('transform', function(d) {
+        d.x = Math.max(8, Math.min(app.width - 24, d.x));
+        d.y = Math.max(8, Math.min(app.height - 8, d.y));
         return 'translate(' + d.x + ',' + d.y + ')';
       });
 
