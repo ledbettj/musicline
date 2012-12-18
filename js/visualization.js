@@ -19,6 +19,15 @@ window.Musicline = window.Musicline || {};
     this.createForce();
     this.createElements();
     this.redraw();
+
+    console.log(this);
+  };
+
+  Visualization.prototype.clear = function() {
+    this.nodes = [];
+    this.links = [];
+    this.force.nodes(this.nodes).links(this.links);
+    this.redraw();
   };
 
   Visualization.prototype.createForce = function() {
@@ -93,7 +102,7 @@ window.Musicline = window.Musicline || {};
 
     var nodeEnter = node.enter().append('svg:g')
         .attr('class', 'node')
-        .on('click', this.clickHandler)
+        .on('mouseup', this.clickHandler)
         .on('mouseover', function(d) {
           if (!d.spent) {
             d3.select(this).select('.label')

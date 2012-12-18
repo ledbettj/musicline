@@ -8,6 +8,7 @@
   "AppName": {
     "en": "MusicLine"
   },
+  "AcceptedLinkTypes": ["artist", "playlist"],
   "BundleIdentifier": "musicline",
   "BundleType": "Application",
   "BundleVersion": "0.1",

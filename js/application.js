@@ -16,8 +16,61 @@ window.Musicline = window.Musicline || {};
       nodeClick: this.nodeClick.bind(this)
     });
 
-    this.addSimilar(this.vis.createNode('Minus the Bear'));
+    this.models.application.observe(this.models.EVENT.LINKSCHANGED, this.handleDrop.bind(this));
     this.vis.redraw();
+  };
+
+  Application.prototype.handleDrop = function() {
+    this.vis.clear();
+
+    _(this.models.application.links).each(function(item) {
+      if (item.indexOf('playlist:') !== -1) {
+        this.handlePlaylistDrop(item);
+      } else if (item.indexOf('artist:') !== -1) {
+        this.handleArtistDrop(item);
+      } else {
+        console.log("unhandled", item);
+      }
+    }.bind(this));
+
+    this.redraw();
+  };
+
+  Application.prototype.handlePlaylistDrop = function(plCode) {
+    var pl = this.models.Playlist.fromURI(plCode);
+    var newNodes = [];
+    _(pl.tracks).each(function(track) {
+      if (!this.vis.findNode(track.artists[0].name)) {
+        var n = this.vis.createNode(track.artists[0].name);
+        newNodes.push(n);
+      }
+    }.bind(this));
+
+    _(newNodes).each(function(n) {
+      n.spent = true;
+      this.addSimilar(n);
+    }.bind(this));
+
+  };
+
+  Application.prototype.handleArtistDrop = function(artistCode) {
+    var artist = this.models.Artist.fromURI(artistCode);
+    var name   = artist.name || artist.data.name;
+
+    if (!name) {
+      console.log('something wrong with artist: ', artist);
+      return;
+    }
+
+    if (!this.vis.findNode(name)) {
+      console.log('created', name);
+      var n = this.vis.createNode(name);
+      n.spent = true;
+      this.addSimilar(n);
+      this.play(n);
+    } else {
+      console.log('found', name);
+    }
   };
 
   Application.prototype.nodeClick = function(d) {
@@ -25,6 +78,7 @@ window.Musicline = window.Musicline || {};
       this.addSimilar(d);
       d.spent = true;
     }
+    this.play(d);
   };
 
   Application.prototype.addSimilar = function(from) {
