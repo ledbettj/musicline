@@ -2,9 +2,21 @@
 /*global d3 $ _ getSpotifyApi*/
 
 window.Musicline = window.Musicline || {};
+
 (function(e) {
   var HILIGHT_COLOR = '#f0f0f0';
   var API_KEY = 'R2TFDDCFU7ZZUMTCR';
+
+  function toParam(object) {
+    var q = '?';
+    for(var key in object) {
+      q += encodeURIComponent(key) + '=';
+      q += encodeURIComponent(object[key].toString()) + '&';
+    }
+
+    return q;
+  }
+
 
   var Application = function(params) {
     var body    = d3.select('body').node();
@@ -21,7 +33,6 @@ window.Musicline = window.Musicline || {};
 
     this.familiarityRange = params.familiarityRange || [0, 100];
     this.growBy = params.growBy || 15;
-    this.doPreview = params.preview !== undefined ? params.preview : true;
 
     this.nodes = [this.root];
     this.links = [];
@@ -33,9 +44,7 @@ window.Musicline = window.Musicline || {};
     this.createElements();
     this.updateVisualization();
 
-    if (this.doPreview) {
-      this.preview(this.root);
-    }
+    this.play(this.root);
 
     this.addSimilar(this.root);
   };
@@ -92,13 +101,13 @@ window.Musicline = window.Musicline || {};
 
   Application.prototype.addSimilar = function(from) {
     var app = this;
-    $.getJSON('http://developer.echonest.com/api/v4/artist/similar', {
+    d3.json('http://developer.echonest.com/api/v4/artist/similar' + toParam({
       name: from.name,
       min_familiarity: this.familiarityRange[0] / 100,
       max_familiarity: this.familiarityRange[1] / 100,
       results: this.growBy,
       api_key: API_KEY
-    }, function(similar) {
+    }), function(similar) {
       _(similar.response.artists).each(function(artist){
         var newNode = _(app.nodes).find(function(n) {
           return n.name == artist.name;
@@ -157,9 +166,7 @@ window.Musicline = window.Musicline || {};
           if (!d.spent) {
             d.spent = true;
             app.addSimilar(d);
-            if (app.doPreview) {
-              app.preview(d);
-            }
+            app.play(d);
           }
         })
         .on('mouseover', function(d) {
@@ -228,7 +235,7 @@ window.Musicline = window.Musicline || {};
     this.updateNodes();
   };
 
-  Application.prototype.preview = function(d) {
+  Application.prototype.play = function(d) {
     var app = this;
     var search = new this.models.Search(d.name, {
       searchArtists: false,

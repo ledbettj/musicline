@@ -2,91 +2,17 @@
 <html>
   <head>
     <script src="/js/d3.v2.js"></script>
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/jquery-ui.min.js"></script>
-    <script src="/js/lodash.min.js"></script>
-    <link href="/css/aristo.css" rel="stylesheet"/>
+    <script src="/js/lodash.js"></script>
     <link href="/css/main.css" rel="stylesheet"/>
   </head>
   <body>
-
-    <div style="display: none;">
-      <div id="dialog-form" title="Where should we start?">
-        <p class="validateTips">Let's pick a musical artist to start with:</p>
-        <form>
-          <input type="text" name="artist" id="input-artist" class="text ui-widget-content ui-corner-all" placeholder="The Rolling Stones" />
-          <div class="label-container">
-            Results per click: 
-            <span id="rpc-label">15</span>
-          </div>
-          <div id="rpc-slider"></div>
-          <div class="label-container">
-            Artist Familiarity: 
-            <span id="fam-label">Give me everything!</span>
-          </div>
-          <div id="fam-slider"></div>
-          <input type="checkbox" name="preview" id="input-preview" class="checkbox ui-widget-content ui-corner-all" checked />
-          <label for="input-preview">Play music</label>
-        </form>
-      </div>
-    </div>
     <script src="/js/application.js"></script>
     <script>
-      $("#fam-slider").slider({
-        range: true,
-        min:   0,
-        max:   100,
-        values: [0, 100],
-        slide: function(e, ui) {
-          if (ui.values[0] <= 20 && ui.values[1] >= 80) {
-            $("#fam-label").text("Give me everything!");
-          } else if (ui.values[0] >= 20 && ui.values[1] >= 80) {
-            $("#fam-label").text("None of that obscure crap.");
-          } else if (ui.values[0] <= 20 && ui.values[1] <= 80) {
-            $("#fam-label").text("Let's keep it obscure.");
-          } else {
-            $("#fam-label").text("A nice middle ground.");
-          }
-        }
-      });
-
-      $("#rpc-slider").slider({
-        min: 5,
-        max: 100,
-        value: 15,
-        slide: function(e, ui) {
-          $("#rpc-label").text(ui.value);
-        }
-      });
-
-      $("#dialog-form").dialog({
-        autoOpen: true,
-        modal:    false,
-        height:   350,
-        width:    350,
-        buttons: [{
-          text: 'Go!',
-          click: function() { $(this).dialog('close'); }
-        }],
-        close: function() {
-          var artist = $("#input-artist").val().trim();
-          var ml = window.Musicline;
-          ml.instance = new ml.Application({
-            rootName: artist.length > 0 ? artist : 'The Rolling Stones',
-            familiarityRange: $("#fam-slider").slider('values'),
-            growBy: $("#rpc-slider").slider('value'),
-            preview: $("#input-preview").is(":checked")
-          });
-        },
-        open: function() {
-          $("#dialog-form").keypress(function(e) {
-            if (e.keyCode == $.ui.keyCode.ENTER) {
-              $(this).dialog('close');
-              e.preventDefault();
-              return false;
-            }
-          });
-        }
+      var ml = window.Musicline;
+      ml.instance = new ml.Application({
+        rootName: 'Minus the Bear',
+        familiarityRange: [0, 100],
+        growBy: 15
       });
     </script>
     <a href="http://the.echonest.com" id="echolink" target="_blank">
