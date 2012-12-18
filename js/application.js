@@ -16,28 +16,24 @@ window.Musicline = window.Musicline || {};
       nodeClick: this.nodeClick.bind(this)
     });
 
+    this.addHTML5DropHandlers();
+
+    this.models.application.observe(this.models.EVENT.LINKSCHANGED, this.handleDrop.bind(this));
+    this.vis.redraw();
+  };
+
+  Application.prototype.addHTML5DropHandlers = function() {
     var body = d3.select('body').node();
 
-    body.addEventListener('dragenter', function(e) {
-      return false;
-    }, false);
-
-    body.addEventListener('dragover', function(e) {
-
+    body.addEventListener('dragenter', function(e) { return false; }, false);
+    body.addEventListener('dragleave', function(e) { return false; }, false);
+    body.addEventListener('dragend',   function(e) { }, false);
+    body.addEventListener('dragover',  function(e) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'copy';
-
       return false;
     }, false);
 
-    body.addEventListener('dragleave', function(e) {
-      return false;
-    }, false);
-
-    body.addEventListener('dragend', function(e) {
-      console.log('end', e);
-
-    }, false);
 
     body.addEventListener('drop', function(e) {
       var item = e.dataTransfer.getData('Text');
@@ -52,10 +48,6 @@ window.Musicline = window.Musicline || {};
       this.vis.redraw();
       return false;
     }.bind(this), false);
-
-
-    this.models.application.observe(this.models.EVENT.LINKSCHANGED, this.handleDrop.bind(this));
-    this.vis.redraw();
   };
 
   Application.prototype.handleDrop = function() {

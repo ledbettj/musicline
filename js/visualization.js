@@ -21,8 +21,6 @@ window.Musicline = window.Musicline || {};
     this.createForce();
     this.createElements();
     this.redraw();
-
-    console.log(this);
   };
 
   Visualization.prototype.clear = function() {
