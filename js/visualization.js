@@ -5,6 +5,8 @@ window.Musicline = window.Musicline || {};
 
 (function(ml) {
   var HILIGHT_COLOR = '#f0f0f0';
+  var TEXT_COLOR    = '#999999';
+  var LINE_COLOR    = '#999999';
 
   var Visualization = function(params) {
     var body    = d3.select('body').node();
@@ -90,7 +92,7 @@ window.Musicline = window.Musicline || {};
     link.exit().remove();
 
     link.style('stroke', function(d) {
-      return d.lit ? HILIGHT_COLOR : "#808080";
+      return d.lit ? HILIGHT_COLOR : LINE_COLOR;
     });
   };
 
@@ -116,7 +118,7 @@ window.Musicline = window.Musicline || {};
         })
         .on('mouseout', function(d) {
           d3.select(this).select('text')
-            .style('fill', '#a0a0a0')
+            .style('fill', TEXT_COLOR)
             .style('text-decoration', 'none');
 
           d3.select(this).select('circle')
@@ -141,7 +143,7 @@ window.Musicline = window.Musicline || {};
 
     node.selectAll('.label')
       .style('fill', function(d) {
-        return d.lit ? HILIGHT_COLOR : '#a0a0a0';
+        return d.lit ? HILIGHT_COLOR : TEXT_COLOR;
       });
 
     node.exit().remove();

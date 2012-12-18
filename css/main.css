@@ -6,23 +6,16 @@ html, body, svg {
   display: block;
 }
 
-body {
-  Background: #303030;
-}
-
 circle.point {
   cursor: pointer;
 }
 
 text.label {
-  font-family: Ubuntu, Helvetica, Tahoma, sans-serif;
-  font-size: 12px;
   cursor: pointer;
   stroke: none;
 }
 
 .link {
-  stroke: #808080;
   stroke-opacity: 50%;
   stroke-width: 1px;
 }

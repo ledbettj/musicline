@@ -54,23 +54,20 @@ window.Musicline = window.Musicline || {};
   };
 
   Application.prototype.handleArtistDrop = function(artistCode) {
-    var artist = this.models.Artist.fromURI(artistCode);
-    var name   = artist.name || artist.data.name;
 
-    if (!name) {
-      console.log('something wrong with artist: ', artist);
-      return;
-    }
+    this.models.Artist.fromURI(artistCode, function(artist) {
+      if (!this.vis.findNode(artist.name)) {
+        console.log('created', artist.name);
+        var n = this.vis.createNode(artist.name);
+        n.spent = true;
+        this.addSimilar(n);
+        this.play(n);
+      } else {
+        console.log('found', artist.name);
+      }
+    }.bind(this));
 
-    if (!this.vis.findNode(name)) {
-      console.log('created', name);
-      var n = this.vis.createNode(name);
-      n.spent = true;
-      this.addSimilar(n);
-      this.play(n);
-    } else {
-      console.log('found', name);
-    }
+
   };
 
   Application.prototype.nodeClick = function(d) {
