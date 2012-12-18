@@ -19,7 +19,6 @@
   "RequiredInterface": 1,
   "RequiredPermissions": [
     "http://developer.echonest.com/",
-    "http://music.throttle.io/",
     "http://the.echonest.com/"
   ],
   "SupportedLanguages": [

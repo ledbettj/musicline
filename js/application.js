@@ -1,9 +1,10 @@
 /*jshint undef:true browser:true*/
-/*global d3 $ _*/
+/*global d3 $ _ getSpotifyApi*/
 
 window.Musicline = window.Musicline || {};
 (function(e) {
   var HILIGHT_COLOR = '#f0f0f0';
+  var API_KEY = 'R2TFDDCFU7ZZUMTCR';
 
   var Application = function(params) {
     var body    = d3.select('body').node();
@@ -91,20 +92,21 @@ window.Musicline = window.Musicline || {};
 
   Application.prototype.addSimilar = function(from) {
     var app = this;
-    var args = 'fMmin=' + app.familiarityRange[0] +
-               '&fMax=' + app.familiarityRange[1] +
-               '&rNum=' + app.growBy;
-
-    d3.json('http://music.throttle.io/artists/' + from.name + '/similar?' + args, function(similar) {
-
-      _(similar).each(function(artistName){
+    $.getJSON('http://developer.echonest.com/api/v4/artist/similar', {
+      name: from.name,
+      min_familiarity: this.familiarityRange[0] / 100,
+      max_familiarity: this.familiarityRange[1] / 100,
+      results: this.growBy,
+      api_key: API_KEY
+    }, function(similar) {
+      _(similar.response.artists).each(function(artist){
         var newNode = _(app.nodes).find(function(n) {
-          return n.name == artistName;
+          return n.name == artist.name;
         });
 
         if (!newNode) {
           newNode = {
-            name:  artistName,
+            name:  artist.name,
             spent: false,
             lit:   false,
             x:    from.x + Math.random() * 100 - 50,
@@ -237,7 +239,6 @@ window.Musicline = window.Musicline || {};
 
     var playlist = new this.models.Playlist();
 
-
     search.observe(this.models.EVENT.CHANGE, function() {
       search.tracks.forEach(function(track) {
         if (track.artists[0].name.toLowerCase() == d.name.toLowerCase()) {
@@ -248,13 +249,6 @@ window.Musicline = window.Musicline || {};
     });
 
     search.appendNext();
-  };
-
-  Application.prototype.play = function(artist, trackIds) {
-    var uri = "spotify:trackset:" + artist.replace(':', '') + ':';
-    uri += trackIds.join(',');
-
-    $("#spotify-frame").attr('src', 'https://embed.spotify.com/?uri=' + uri);
   };
 
   e.Application = Application;
