@@ -84,8 +84,10 @@ window.Musicline = window.Musicline || {};
           .attr("y2", function(d) { return d.target.y; });
 
       node.attr('transform', function(d) {
-        d.x = Math.max(8, Math.min(app.width - 24, d.x));
-        d.y = Math.max(8, Math.min(app.height - 8, d.y));
+        var box = d3.select(this).node().getBBox();
+
+        d.x = Math.max(box.height, Math.min(app.width - box.width, d.x));
+        d.y = Math.max(box.height, Math.min(app.height - box.height, d.y));
         return 'translate(' + d.x + ',' + d.y + ')';
       });
 
