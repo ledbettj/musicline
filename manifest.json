@@ -1,0 +1,29 @@
+{
+  "AppDescription": {
+    "en": "Find similar artists and view artist connections."
+  },
+  "AppIcon": {
+    "36x18": "tutorial.png"
+  },
+  "AppName": {
+    "en": "MusicLine"
+  },
+  "BundleIdentifier": "musicline",
+  "BundleType": "Application",
+  "BundleVersion": "0.1",
+  "Dependencies": {
+    "api": "0.2.3",
+    "util": "0.2.3",
+    "resources": "0.2.2"
+  },
+  "RequiredInterface": 1,
+  "RequiredPermissions": [
+    "http://developer.echonest.com/",
+    "http://music.throttle.io/",
+    "http://the.echonest.com/"
+  ],
+  "SupportedLanguages": [
+    "en"
+  ],
+  "VendorIdentifier": "io.throttle"
+}

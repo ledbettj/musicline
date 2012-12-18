@@ -25,6 +25,9 @@ window.Musicline = window.Musicline || {};
     this.nodes = [this.root];
     this.links = [];
 
+    this.api = getSpotifyApi();
+    this.models = this.api.require('$api/models');
+
     this.createForce();
     this.createElements();
     this.updateVisualization();
@@ -92,7 +95,7 @@ window.Musicline = window.Musicline || {};
                '&fMax=' + app.familiarityRange[1] +
                '&rNum=' + app.growBy;
 
-    d3.json('/artists/' + from.name + '/similar?' + args, function(similar) {
+    d3.json('http://music.throttle.io/artists/' + from.name + '/similar?' + args, function(similar) {
 
       _(similar).each(function(artistName){
         var newNode = _(app.nodes).find(function(n) {
@@ -225,12 +228,26 @@ window.Musicline = window.Musicline || {};
 
   Application.prototype.preview = function(d) {
     var app = this;
-
-    d3.json('/artists/' + d.name + '/clip', function(data) {
-      if (data) {
-        app.play(d.name, data);
-      }
+    var search = new this.models.Search(d.name, {
+      searchArtists: false,
+      searchAlbums:  false,
+      searchPlaylists: false,
+      searchTracks: true
     });
+
+    var playlist = new this.models.Playlist();
+
+
+    search.observe(this.models.EVENT.CHANGE, function() {
+      search.tracks.forEach(function(track) {
+        if (track.artists[0].name.toLowerCase() == d.name.toLowerCase()) {
+          playlist.add(track);
+        }
+      });
+      app.models.player.play(playlist.get(0), playlist);
+    });
+
+    search.appendNext();
   };
 
   Application.prototype.play = function(artist, trackIds) {
