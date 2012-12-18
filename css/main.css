@@ -10,13 +10,13 @@ body {
   Background: #303030;
 }
 
-circle.node {
+circle.point {
   cursor: pointer;
 }
 
-text.node {
+text.label {
   font-family: Ubuntu, Helvetica, Tahoma, sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   cursor: pointer;
   stroke: none;
 }
@@ -25,27 +25,6 @@ text.node {
   stroke: #808080;
   stroke-opacity: 50%;
   stroke-width: 1px;
-}
-
-
-fieldset {
-  border: none;
-}
-
-#dialog-form {
-  font-size: 12px;
-}
-
-#input-artist {
-  width: 98%;
-  padding: 4px;
-}
-
-.label-container {
-  margin: 12px 0px;
-}
-#fam-slider {
-  margin: 12px 0px;
 }
 
 #echolink {
