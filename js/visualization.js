@@ -18,9 +18,20 @@ window.Musicline = window.Musicline || {};
 
     this.clickHandler = params.nodeClick || function() {};
 
+
     this.createForce();
     this.createElements();
     this.redraw();
+
+    window.addEventListener('resize', function(e) {
+      var body = d3.select('body').node();
+      this.width  = body.clientWidth;
+      this.height = body.clientHeight;
+      this.svg.attr('width', this.width);
+      this.svg.attr('height', this.height);
+      this.force.size([this.width, this.height]).start();
+
+    }.bind(this), false);
   };
 
   Visualization.prototype.clear = function() {
@@ -35,7 +46,9 @@ window.Musicline = window.Musicline || {};
       .nodes(this.nodes)
       .links(this.links)
       .linkDistance(function(d) { return 75 + Math.random() * 95;})
-      .charge(-400)
+    .linkStrength(0.5)
+      .charge(-150)
+      .gravity(0.01)
       .size([this.width, this.height]);
   };
 
@@ -171,13 +184,13 @@ window.Musicline = window.Musicline || {};
 
   Visualization.prototype.findNode = function(artist) {
     return _(this.nodes).find(function(n) {
-      return n.name.toLowerCase() == artist.toLowerCase();
+      return n.name.toLowerCase() == artist.decodeForText().toLowerCase();
     });
   };
 
   Visualization.prototype.createNode = function(artist, parent) {
     var node = {
-      name:  artist,
+      name:  artist.decodeForText(),
       spent: false,
       lit:   false,
       x:     parent ? parent.x + Math.random() * 100 - 50 : this.width  / 2,

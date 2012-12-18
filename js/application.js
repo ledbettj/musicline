@@ -11,15 +11,20 @@ window.Musicline = window.Musicline || {};
 
     this.api    = getSpotifyApi();
     this.models = this.api.require('$api/models');
+    this.dnd    = this.api.require('$util/dnd');
 
     this.vis = new ml.Visualization({
       nodeClick: this.nodeClick.bind(this)
     });
 
+    this.playlist = new this.models.Playlist();
+
     this.addHTML5DropHandlers();
 
     this.models.application.observe(this.models.EVENT.LINKSCHANGED, this.handleDrop.bind(this));
     this.vis.redraw();
+
+    this._first = true;
   };
 
   Application.prototype.addHTML5DropHandlers = function() {
@@ -41,6 +46,7 @@ window.Musicline = window.Musicline || {};
       if (item.indexOf('playlist:') !== -1) {
         this.handlePlaylistDrop(item);
       } else if (item.indexOf('artist:') !== -1) {
+        this._first = true;
         this.handleArtistDrop(item);
       } else {
         console.log("unhandled", item);
@@ -57,6 +63,7 @@ window.Musicline = window.Musicline || {};
       if (item.indexOf('playlist:') !== -1) {
         this.handlePlaylistDrop(item);
       } else if (item.indexOf('artist:') !== -1) {
+        this._first = true;
         this.handleArtistDrop(item);
       } else {
         console.log("unhandled", item);
@@ -69,6 +76,7 @@ window.Musicline = window.Musicline || {};
   Application.prototype.handlePlaylistDrop = function(plCode) {
     var pl = this.models.Playlist.fromURI(plCode);
     var newNodes = [];
+
     _(pl.tracks).each(function(track) {
       if (!this.vis.findNode(track.artists[0].name)) {
         var n = this.vis.createNode(track.artists[0].name);
@@ -87,13 +95,11 @@ window.Musicline = window.Musicline || {};
 
     this.models.Artist.fromURI(artistCode, function(artist) {
       if (!this.vis.findNode(artist.name)) {
-        console.log('created', artist.name);
         var n = this.vis.createNode(artist.name);
         n.spent = true;
         this.addSimilar(n);
         this.play(n);
       } else {
-        console.log('found', artist.name);
       }
     }.bind(this));
 
@@ -136,23 +142,45 @@ window.Musicline = window.Musicline || {};
 
   Application.prototype.play = function(d) {
     var app = this;
-    var search = new this.models.Search(d.name, {
-      searchArtists: false,
-      searchAlbums:  false,
-      searchPlaylists: false,
-      searchTracks: true
-    });
 
-    var playlist = new this.models.Playlist();
+    var search = new this.models.Search(d.name, {
+      searchArtists:   false,
+      searchAlbums:    false,
+      searchPlaylists: false,
+      searchTracks:    true,
+      pageSize:        10
+    });
 
     search.observe(this.models.EVENT.CHANGE, function() {
-      search.tracks.forEach(function(track) {
-        if (track.artists[0].name.toLowerCase() == d.name.toLowerCase()) {
-          playlist.add(track);
-        }
+      var tracks = [];
+
+      search.tracks.forEach(function(t) {
+        tracks.push(t);
       });
-      app.models.player.play(playlist.get(0), playlist);
-    });
+
+      tracks = _.filter(tracks, function(track) {
+        return track.artists[0].name.decodeForText().toLowerCase() == d.name.toLowerCase();
+      });
+
+      console.log("before shuffle");
+      tracks = _(tracks).shuffle().take(3).value();
+      console.log('after shuffle', tracks);
+
+      _.each(tracks, function(track) {
+        app.playlist.add(track);
+        console.log('added', track);
+      });
+
+      if (app._first) {
+        try {
+          app.models.player.play(tracks[0], app.playlist);
+        }catch(err) {
+          console.log("ERR", err);
+        }
+        app._first = false;
+      }
+    }.bind(this));
+
 
     search.appendNext();
   };
