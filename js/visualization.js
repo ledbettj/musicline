@@ -45,7 +45,8 @@ window.Musicline = window.Musicline || {};
     this.svg = d3.select('body')
       .append('svg:svg')
       .attr('width', this.width)
-      .attr('height', this.height);
+      .attr('height', this.height)
+      .attr('id', 'musicline-svg');
 
     this.linkGroup = this.svg.append('svg:g');
     this.nodeGroup = this.svg.append('svg:g');

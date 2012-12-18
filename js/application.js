@@ -16,6 +16,44 @@ window.Musicline = window.Musicline || {};
       nodeClick: this.nodeClick.bind(this)
     });
 
+    var body = d3.select('body').node();
+
+    body.addEventListener('dragenter', function(e) {
+      return false;
+    }, false);
+
+    body.addEventListener('dragover', function(e) {
+
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+
+      return false;
+    }, false);
+
+    body.addEventListener('dragleave', function(e) {
+      return false;
+    }, false);
+
+    body.addEventListener('dragend', function(e) {
+      console.log('end', e);
+
+    }, false);
+
+    body.addEventListener('drop', function(e) {
+      var item = e.dataTransfer.getData('Text');
+      this.vis.clear();
+      if (item.indexOf('playlist:') !== -1) {
+        this.handlePlaylistDrop(item);
+      } else if (item.indexOf('artist:') !== -1) {
+        this.handleArtistDrop(item);
+      } else {
+        console.log("unhandled", item);
+      }
+      this.vis.redraw();
+      return false;
+    }.bind(this), false);
+
+
     this.models.application.observe(this.models.EVENT.LINKSCHANGED, this.handleDrop.bind(this));
     this.vis.redraw();
   };
