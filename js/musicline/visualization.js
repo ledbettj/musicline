@@ -1,5 +1,5 @@
 /*jshint undef:true browser:true devel:true*/
-/*global d3 _ getSpotifyApi*/
+/*global d3 _ Spotify*/
 
 window.Musicline = window.Musicline || {};
 
@@ -32,6 +32,32 @@ window.Musicline = window.Musicline || {};
       this.force.size([this.width, this.height]).start();
 
     }.bind(this), false);
+  };
+
+  Visualization.prototype.pulseOn = function(n) {
+    console.log('on', n.name);
+    var g = this.nodeGroup.select('#' + n.id);
+    var p = g.select('.pulse');
+
+    if (!p || !p.node()) {
+      for(var i = 1; i <= 3; ++i) {
+        g.append('svg:circle')
+          .attr('r', 0)
+          .attr('class', 'pulse')
+          .append('svg:animate')
+          .attr('from', '0')
+          .attr('to', 6 * i)
+          .attr('dur', '1s')
+          .attr('attributeName', 'r')
+          .attr('repeatCount', 'indefinite');
+      }
+    }
+    this.redraw();
+  };
+
+  Visualization.prototype.pulseOff = function() {
+    this.nodeGroup.selectAll('.pulse').remove();
+    this.redraw();
   };
 
   Visualization.prototype.clear = function() {
@@ -121,6 +147,7 @@ window.Musicline = window.Musicline || {};
 
     var nodeEnter = node.enter().append('svg:g')
         .attr('class', 'node')
+        .attr('id', function(d) { return d.id; })
         .on('mouseup', this.clickHandler)
         .on('mouseover', function(d) {
           if (!d.spent) {
@@ -194,8 +221,10 @@ window.Musicline = window.Musicline || {};
   };
 
   Visualization.prototype.createNode = function(artist, parent) {
+    var id = 'id_' + artist.decodeForText().replace(/[^A-Za-z0-9_]/g, '_').toLowerCase();
     var node = {
       name:  artist.decodeForText(),
+      id:    id,
       spent: false,
       lit:   false,
       x:     parent ? parent.x + Math.random() * 100 - 50 : this.width  / 2,

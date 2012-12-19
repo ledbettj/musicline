@@ -31,3 +31,10 @@ text.label {
   right: 12px;
   top: 12px;
 }
+
+.pulse {
+  stroke-width: 1px;
+  fill: none;
+  stroke: #fff;
+  stroke-opacity: 0.25;
+}

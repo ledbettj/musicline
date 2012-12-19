@@ -35,6 +35,20 @@ window.Musicline = window.Musicline || {};
     this.playlist = new Spotify.models.Playlist();
     this.vis.redraw();
 
+
+    Spotify.models.player.observe(Spotify.models.EVENT.CHANGE, function(e) {
+      var track = null, n = null;
+      if (e.type == "playerStateChanged") {
+        d3.select('.animation').remove();
+        if (e.data.curtrack && (track = Spotify.models.player.track) &&
+            (n = this.vis.findNode(track.artists[0].name))) {
+          this.vis.pulseOn(n);
+        } else {
+          this.vis.pulseOff();
+        }
+      }
+    }.bind(this));
+
     this._first = true;
   };
 
