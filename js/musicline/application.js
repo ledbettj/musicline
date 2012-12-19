@@ -13,6 +13,12 @@ window.Musicline = window.Musicline || {};
     this.models = this.api.require('$api/models');
     this.dnd    = this.api.require('$util/dnd');
 
+
+    this.echo = new ml.Echonest({
+      apiKey: 'R2TFDDCFU7ZZUMTCR'
+    });
+
+
     this.vis = new ml.Visualization({
       nodeClick: this.nodeClick.bind(this)
     });
@@ -114,28 +120,14 @@ window.Musicline = window.Musicline || {};
 
   Application.prototype.addSimilar = function(from) {
 
-    d3.json(
-      'http://developer.echonest.com/api/v4/artist/similar' +
-        ml.util.toParam({
-          name: from.name,
-          min_familiarity: this.familiarity[0] / 100,
-          max_familiarity: this.familiarity[1] / 100,
-          results: this.growBy,
-          api_key: ml.util.API_KEY
-        }),
-
-      function(similar) {
-        similar = similar.response.artists;
-
-        _(similar).each(function(artist){
-          var node = (this.vis.findNode(artist.name) ||
-                      this.vis.createNode(artist.name, from));
-
-          this.vis.linkNodes(from, node);
-        }.bind(this));
-
-        this.vis.redraw();
+    this.echo.getSimilar(from.name, {}, function(artists) {
+      _.each(artists, function(artist){
+        var node = (this.vis.findNode(artist) || this.vis.createNode(artist, from));
+        this.vis.linkNodes(from, node);
       }.bind(this));
+
+      this.vis.redraw();
+    }.bind(this));
   };
 
   Application.prototype.play = function(d) {
