@@ -17,42 +17,34 @@ window.Musicline = window.Musicline || {};
     this.dnd = new ml.DragHandler({});
 
     this.dnd.onArtist = function(artist) {
-      if (!this.vis.findNode(artist.name)) {
-        var n = this.vis.createNode(artist.name, this.dnd.dropEvent);
-        n.spent = true;
-        this.addSimilar(n);
-        this.vis.redraw();
-        this.play(n);
-      }
+      this.maybeCreateArist(artist.name, this.dnd.dropEvent);
     }.bind(this);
 
     this.dnd.onPlaylist = function(pl) {
       _.each(pl.tracks, function(track) {
-        if (!this.vis.findNode(track.artists[0].name)) {
-          var n = this.vis.createNode(track.artists[0].name, this.dnd.dropEvent);
-          n.spent = true;
-          this.addSimilar(n);
-          this.play(n);
-        }
-        this.vis.redraw();
+        this.maybeCreateArist(track.artists[0].name, this.dnd.dropEvent);
       }.bind(this));
+      this.vis.redraw();
     }.bind(this);
 
     this.dnd.onTrack = function(track) {
-      if (!this.vis.findNode(track.artists[0].name)) {
-        var n = this.vis.createNode(track.artists[0].name, this.dnd.dropEvent);
-        n.spent = true;
-        this.addSimilar(n);
-        this.play(n);
-        this.vis.redraw();
-      }
-
+      this.maybeCreateArist(track.artists[0].name, this.dnd.dropEvent);
+      this.vis.redraw();
     }.bind(this);
 
     this.playlist = new Spotify.models.Playlist();
     this.vis.redraw();
 
     this._first = true;
+  };
+
+  Application.prototype.maybeCreateArist = function(name, parent) {
+    if (!this.vis.findNode(name)) {
+      var n = this.vis.createNode(name, parent);
+      n.spent = true;
+      this.addSimilar(n);
+      this.play(n);
+    }
   };
 
   Application.prototype.nodeClick = function(d) {
@@ -73,6 +65,14 @@ window.Musicline = window.Musicline || {};
 
       this.vis.redraw();
     }.bind(this));
+  };
+
+
+  Application.prototype.restart = function() {
+    this.vis.clear();
+    this.vis.redraw();
+    this.playlist = new Spotify.models.Playlist();
+    this._first = true;
   };
 
   Application.prototype.play = function(d) {

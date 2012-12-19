@@ -25,3 +25,9 @@ text.label {
   right: 12px;
   bottom: 12px;
 }
+
+#clear-button {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+}

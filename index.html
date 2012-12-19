@@ -17,5 +17,11 @@
     <a href="http://the.echonest.com" id="echolink" target="_blank">
       <img src="/images/EN_P_on_Light_Transparent.png">
     </a>
+    <button class="new-button" id="clear-button">Clear</button>
+    <script>
+      d3.select('#clear-button').on('click', function() {
+        window.Musicline.instance.restart();
+      });
+    </script>
   </body>
 </html>
