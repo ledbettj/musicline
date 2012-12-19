@@ -35,6 +35,5 @@ text.label {
 .pulse {
   stroke-width: 1px;
   fill: none;
-  stroke: #fff;
   stroke-opacity: 0.25;
 }

@@ -35,22 +35,28 @@ window.Musicline = window.Musicline || {};
   };
 
   Visualization.prototype.pulseOn = function(n) {
-    console.log('on', n.name);
+    this.nodeGroup.selectAll('.pulse').remove();
     var g = this.nodeGroup.select('#' + n.id);
-    var p = g.select('.pulse');
 
-    if (!p || !p.node()) {
-      for(var i = 1; i <= 3; ++i) {
-        g.append('svg:circle')
-          .attr('r', 0)
-          .attr('class', 'pulse')
-          .append('svg:animate')
-          .attr('from', '0')
-          .attr('to', 6 * i)
-          .attr('dur', '1s')
-          .attr('attributeName', 'r')
-          .attr('repeatCount', 'indefinite');
-      }
+    for(var i = 1; i <= 3; ++i) {
+      var c = g.append('svg:circle')
+        .attr('r', 0)
+        .attr('class', 'pulse')
+        .style('stroke', d3.rgb(n.color).brighter(0.75));
+
+      c.append('svg:animate')
+        .attr('from', '0')
+        .attr('to', 6 * i)
+        .attr('dur', '1s')
+        .attr('attributeName', 'r')
+        .attr('repeatCount', 'indefinite');
+
+      c.append('svg:animate')
+        .attr('from', 1.0)
+        .attr('to', 0.10)
+        .attr('dur', '1s')
+        .attr('attributeName', 'stroke-opacity')
+        .attr('repeatCount', 'indefinite');
     }
     this.redraw();
   };
@@ -165,7 +171,7 @@ window.Musicline = window.Musicline || {};
             .style('fill', TEXT_COLOR)
             .style('text-decoration', 'none');
 
-          d3.select(this).select('circle')
+          d3.select(this).select('.point')
             .style('fill', d.color);
 
           vis.dimConnected();
