@@ -40,7 +40,8 @@ window.Musicline = window.Musicline || {};
       var track = null, n = null;
       if (e.type == "playerStateChanged") {
         d3.select('.animation').remove();
-        if (e.data.curtrack && (track = Spotify.models.player.track) &&
+        if (Spotify.models.player.playing &&
+            (track = Spotify.models.player.track) &&
             (n = this.vis.findNode(track.artists[0].name))) {
           this.vis.pulseOn(n);
         } else {
