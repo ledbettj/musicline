@@ -12,6 +12,7 @@ window.Musicline = window.Musicline || {};
     this.onPlaylist = params.onPlaylist || stub;
     this.onAlbum    = params.onAlbum    || stub;
     this.onUser     = params.onUser     || stub;
+    this.onTrack    = params.onTrack    || stub;
 
     this.installHTML5Handler();
     this.installSpotifyHandler();
@@ -51,15 +52,19 @@ window.Musicline = window.Musicline || {};
         .replace(/\//g, ':');
     }
 
-    try {
-      console.log("DROP", uri);
-      if (uri.indexOf('playlist:') !== -1) {
-        Spotify.models.Playlist.fromURI(uri, this.onPlaylist);
-      } else if (uri.indexOf('artist:') !== -1) {
-        Spotify.models.Artist.fromURI(uri, this.onArtist);
-      }
-    }catch(ex) {
-      console.log("ERROR", ex);
+    console.log("DROP", uri);
+    if (uri.indexOf('playlist:') !== -1) {
+      Spotify.models.Playlist.fromURI(uri, this.onPlaylist);
+    } else if (uri.indexOf('artist:') !== -1) {
+      Spotify.models.Artist.fromURI(uri, this.onArtist);
+    } else if (uri.indexOf('track:') !== -1) {
+      Spotify.models.Track.fromURI(uri, this.onTrack);
+    } else if (uri.indexOf('album:') !== -1) {
+      Spotify.models.Album.fromURI(uri, this.onAlbum);
+    } else if (uri.indexOf('user:') !== -1) {
+      Spotify.models.User.fromURI(uri, this.onUser);
+    } else {
+
     }
   };
 

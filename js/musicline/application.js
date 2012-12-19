@@ -14,28 +14,40 @@ window.Musicline = window.Musicline || {};
       nodeClick: this.nodeClick.bind(this)
     });
 
-    this.dnd = new ml.DragHandler({
-      onArtist:   function(artist) {
-        if (!this.vis.findNode(artist.name)) {
-          var n = this.vis.createNode(artist.name, this.dnd.dropEvent);
+    this.dnd = new ml.DragHandler({});
+
+    this.dnd.onArtist = function(artist) {
+      if (!this.vis.findNode(artist.name)) {
+        var n = this.vis.createNode(artist.name, this.dnd.dropEvent);
+        n.spent = true;
+        this.addSimilar(n);
+        this.vis.redraw();
+        this.play(n);
+      }
+    }.bind(this);
+
+    this.dnd.onPlaylist = function(pl) {
+      _.each(pl.tracks, function(track) {
+        if (!this.vis.findNode(track.artists[0].name)) {
+          var n = this.vis.createNode(track.artists[0].name, this.dnd.dropEvent);
           n.spent = true;
           this.addSimilar(n);
-          this.vis.redraw();
           this.play(n);
         }
-      }.bind(this),
-      onPlaylist: function(pl) {
-        this.vis.clear();
-        _.each(pl.tracks, function(track) {
-          if (!this.vis.findNode(track.artists[0].name)) {
-            var n = this.vis.createNode(track.artists[0].name, this.dnd.dropEvent);
-            n.spent = true;
-            this.addSimilar(n);
-          }
-          this.vis.redraw();
-        }.bind(this));
-      }.bind(this)
-    });
+        this.vis.redraw();
+      }.bind(this));
+    }.bind(this);
+
+    this.dnd.onTrack = function(track) {
+      if (!this.vis.findNode(track.artists[0].name)) {
+        var n = this.vis.createNode(track.artists[0].name, this.dnd.dropEvent);
+        n.spent = true;
+        this.addSimilar(n);
+        this.play(n);
+        this.vis.redraw();
+      }
+
+    }.bind(this);
 
     this.playlist = new Spotify.models.Playlist();
     this.vis.redraw();
