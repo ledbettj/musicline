@@ -6,9 +6,6 @@ window.Musicline = window.Musicline || {};
 (function(ml) {
 
   var Application = function(params) {
-    this.familiarity = params.familiarity || [0, 100];
-    this.growBy      = params.growBy      || 15;
-
     this.echo = new ml.Echonest({
       apiKey: 'R2TFDDCFU7ZZUMTCR'
     });
