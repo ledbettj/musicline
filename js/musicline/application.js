@@ -1,5 +1,5 @@
 /*jshint undef:true browser:true devel:true*/
-/*global d3 _ getSpotifyApi*/
+/*global d3 _ Spotify*/
 
 window.Musicline = window.Musicline || {};
 
@@ -9,105 +9,41 @@ window.Musicline = window.Musicline || {};
     this.familiarity = params.familiarity || [0, 100];
     this.growBy      = params.growBy      || 15;
 
-    this.api    = getSpotifyApi();
-    this.models = this.api.require('$api/models');
-    this.dnd    = this.api.require('$util/dnd');
-
-
     this.echo = new ml.Echonest({
       apiKey: 'R2TFDDCFU7ZZUMTCR'
     });
-
 
     this.vis = new ml.Visualization({
       nodeClick: this.nodeClick.bind(this)
     });
 
-    this.playlist = new this.models.Playlist();
+    this.dnd = new ml.DragHandler({
+      onArtist:   function(artist) {
+        if (!this.vis.findNode(artist.name)) {
+          var n = this.vis.createNode(artist.name, this.dnd.dropEvent);
+          n.spent = true;
+          this.addSimilar(n);
+          this.vis.redraw();
+          this.play(n);
+        }
+      }.bind(this),
+      onPlaylist: function(pl) {
+        this.vis.clear();
+        _.each(pl.tracks, function(track) {
+          if (!this.vis.findNode(track.artists[0].name)) {
+            var n = this.vis.createNode(track.artists[0].name, this.dnd.dropEvent);
+            n.spent = true;
+            this.addSimilar(n);
+          }
+          this.vis.redraw();
+        }.bind(this));
+      }.bind(this)
+    });
 
-    this.addHTML5DropHandlers();
-
-    this.models.application.observe(this.models.EVENT.LINKSCHANGED, this.handleDrop.bind(this));
+    this.playlist = new Spotify.models.Playlist();
     this.vis.redraw();
 
     this._first = true;
-  };
-
-  Application.prototype.addHTML5DropHandlers = function() {
-    var body = d3.select('body').node();
-
-    body.addEventListener('dragenter', function(e) { return false; }, false);
-    body.addEventListener('dragleave', function(e) { return false; }, false);
-    body.addEventListener('dragend',   function(e) { }, false);
-    body.addEventListener('dragover',  function(e) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'copy';
-      return false;
-    }, false);
-
-
-    body.addEventListener('drop', function(e) {
-      var item = e.dataTransfer.getData('Text');
-      if (item.indexOf('playlist:') !== -1) {
-        this.vis.clear();
-        this.handlePlaylistDrop(item);
-      } else if (item.indexOf('artist:') !== -1) {
-        this.handleArtistDrop(item, e);
-      } else {
-        console.log("unhandled", item);
-      }
-      this.vis.redraw();
-      return false;
-    }.bind(this), false);
-  };
-
-  Application.prototype.handleDrop = function() {
-
-    _(this.models.application.links).each(function(item) {
-      if (item.indexOf('playlist:') !== -1) {
-        this.vis.clear();
-        this.handlePlaylistDrop(item);
-      } else if (item.indexOf('artist:') !== -1) {
-        this.handleArtistDrop(item);
-      } else {
-        console.log("unhandled", item);
-      }
-    }.bind(this));
-
-    this.redraw();
-  };
-
-  Application.prototype.handlePlaylistDrop = function(plCode) {
-    var pl = this.models.Playlist.fromURI(plCode);
-    var newNodes = [];
-
-    _(pl.tracks).each(function(track) {
-      if (!this.vis.findNode(track.artists[0].name)) {
-        var n = this.vis.createNode(track.artists[0].name);
-        newNodes.push(n);
-      }
-    }.bind(this));
-
-    _(newNodes).each(function(n) {
-      n.spent = true;
-      this.addSimilar(n);
-    }.bind(this));
-
-  };
-
-  Application.prototype.handleArtistDrop = function(artistCode, e) {
-
-    this.models.Artist.fromURI(artistCode, function(artist) {
-      if (!this.vis.findNode(artist.name)) {
-        var n = this.vis.createNode(artist.name, e);
-        n.spent = true;
-        this.addSimilar(n);
-        this.play(n);
-      } else {
-      }
-    }.bind(this));
-
-
   };
 
   Application.prototype.nodeClick = function(d) {
@@ -133,7 +69,7 @@ window.Musicline = window.Musicline || {};
   Application.prototype.play = function(d) {
     var app = this;
 
-    var search = new this.models.Search(d.name, {
+    var search = new Spotify.models.Search(d.name, {
       searchArtists:   false,
       searchAlbums:    false,
       searchPlaylists: false,
@@ -141,7 +77,7 @@ window.Musicline = window.Musicline || {};
       pageSize:        10
     });
 
-    search.observe(this.models.EVENT.CHANGE, function() {
+    search.observe(Spotify.models.EVENT.CHANGE, function() {
       var tracks = [];
 
       search.tracks.forEach(function(t) {
@@ -163,7 +99,7 @@ window.Musicline = window.Musicline || {};
 
       if (app._first) {
         try {
-          app.models.player.play(tracks[0], app.playlist);
+          Spotify.models.player.play(tracks[0], app.playlist);
         }catch(err) {
           console.log("ERR", err);
         }
