@@ -77,7 +77,7 @@ window.Musicline = window.Musicline || {};
     this.force = d3.layout.force()
       .nodes(this.nodes)
       .links(this.links)
-      .linkDistance(function(d) { return 75 + Math.random() * 95;})
+      .linkDistance(function(d) { return d.distance; })
     .linkStrength(0.5)
       .charge(-10)
       .gravity(0)
@@ -245,7 +245,8 @@ window.Musicline = window.Musicline || {};
   Visualization.prototype.linkNodes = function(from, to) {
     this.links.push({
       source: from,
-      target: to
+      target: to,
+      distance: 75 + Math.random() * 95
     });
   };
 
